@@ -1,0 +1,49 @@
+WARNING: /Users/bhaller/Library/Python/3.13/lib/python/site-packages/stdpopsim/genomes.py:418: NonAutosomalWarning: Non-autosomal simulations are not yet supported. See https://github.com/popsim-consortium/stdpopsim/issues/383 and https://github.com/popsim-consortium/stdpopsim/issues/406
+  warnings.warn(
+
+WARNING: /Users/bhaller/Library/Python/3.13/lib/python/site-packages/stdpopsim/genetic_maps.py:113: UserWarning: Genetic map not found for chromosome: 'Y' on map: 'HapMapII_GRCh38', substituting a flat map with chromosome recombination rate 0.0
+  warnings.warn(
+
+Simulation information:
+    Engine: slim (5.0)
+    Model id: OutOfAfrica_2T12
+    Model description: Two population out-of-Africa
+    Population: number_samples (sampling_time_generations):
+        AFR: 1 (0)
+        EUR: 2 (0)
+Contig Description:
+    Contig origin: chrY:0-57227415
+    Contig length: 57227415.0
+    Contig ploidy: 1
+    Mutation rate: 2.36e-08
+    Recombination rate: 0.0
+    Genetic map: HapMapII_GRCh38
+    DFE: PosNeg_R24
+    DFE applied to: ensembl_havana_104_CDS elements on chrY
+
+WARNING: /Users/bhaller/Library/Python/3.13/lib/python/site-packages/stdpopsim/slim_engine.py:1496: SLiMOddSampleWarning: SLiM simulates diploid individuals, so 1 individuals will be sampled for the 1 haploids requested from population AFR at time 0.0. See #464.
+  warnings.warn(
+
+If you use this simulation in published work, please cite:
+[stdpopsim]
+Adrion et al., 2020: https://doi.org/10.7554/eLife.54967
+[stdpopsim]
+Lauterbur et al., 2023: https://doi.org/10.7554/eLife.84874
+[simulation engine]
+Haller et al., 2019: https://doi.org/10.1111/1755-0998.12968
+[generation time]
+Tremblay and Vézina, 2000: https://doi.org/10.1086/302770
+[population size]
+Takahata, 1993: https://doi.org/10.1093/oxfordjournals.molbev.a039995
+[genome assembly]
+International Human Genome Sequencing Consortium, 2001: http://dx.doi.org/10.1038/35057062
+[genetic map, recombination rate]
+The International HapMap Consortium, 2007: https://doi.org/10.1038/nature06258
+[demographic model]
+Tennessen et al., 2012: https://doi.org/10.1126/science.1219240
+[demographic model]
+Fu et al., 2013: https://doi.org/10.1038/nature11690
+[distribution of fitness effects]
+Rodrigues et al., 2024: https://doi.org/10.1093/genetics/iyae006
+[distribution of fitness effects]
+Castellano et al., 2019: https://doi.org/10.1534/genetics.119.302494

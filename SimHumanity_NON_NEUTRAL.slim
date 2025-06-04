@@ -1,0 +1,95 @@
+// SimHumanity_NON_NEUTRAL.slim
+//
+// By Ben Haller, 3 June 2025
+// Messer Lab, Cornell University
+
+// This simulates humans with full genomes.  This version simulates only
+// non-neutral mutations, in preparation for using tree-sequence recording.
+
+// This model requires SLiM 5.0 or later to run.  For further information,
+// see the publication associated with this repository.
+
+initialize() {
+	// set the working directory to our data repository
+	defineConstant("REPO_PATH", "~/Documents/Research/MesserLab/SLiM_project/Publication 2025 HumanPopGen/SimHumanity/");
+	if (!fileExists(REPO_PATH))
+			stop("incorrect repository path");
+	setwd(REPO_PATH);
+	
+	// this is the subpath to the chromosome data files
+	defineConstant("CHR_PATH", "stdpopsim extraction/extracted/");
+	if (!fileExists(CHR_PATH))
+			stop("malformed repository; missing extracted data");
+	
+	// enable separate sexes; we want to simulate sex chromosomes
+	initializeSex();
+	
+	// define constants for the DFE that stdpopsim calls "PosNeg_R24",
+	// from Rodrigues et al., 2024 (https://doi.org/10.1093/genetics/iyae006)
+	// MU_NEUTR is the neutral mutation rate within coding regions; in
+	// non-coding regions all mutations are neutral so it is MU_TOTAL
+	//defineConstant("MU_TOTAL", 2.36e-08);
+	defineConstant("MU_BENEF", 1e-12);
+	defineConstant("MU_DELET", 1.2e-8);
+	//defineConstant("MU_NEUTR", MU_TOTAL - (MU_BENEF + MU_DELET));
+	defineConstant("MU_CODING", MU_BENEF + MU_DELET);
+	
+	// mutation type m0 represents neutral mutations in non-coding regions
+	//initializeMutationType("m0", 0.5, "f", 0.0);
+	
+	// mutation type m1 represents neutral mutations in coding regions
+	//initializeMutationType("m1", 0.5, "f", 0.0);
+	
+	// mutation type m2 represents deleterious mutations
+	initializeMutationType("m2", 0.5, "g", -0.03, 0.16);
+	
+	// mutation type m3 represents beneficial mutations
+   initializeMutationType("m3", 0.5, "e", 0.01);
+	
+	// genomic element type g0 represents non-coding regions
+	//initializeGenomicElementType("g0", m0, 1.0);
+	
+	// genomic element type g1 represents coding regions
+	initializeGenomicElementType("g1", c(m2, m3), c(MU_DELET, MU_BENEF));
+	
+	// define the ids, symbols, types, and lengths of all chromosomes
+	ids = 1:24;
+	symbols = c(1:22, "X", "Y");
+	types = c(rep("A", 22), "X", "Y");
+	lengths = c(248956422, 242193529, 198295559, 190214555, 181538259,
+		170805979, 159345973, 145138636, 138394717, 133797422, 135086622,
+		133275309, 114364328, 107043718, 101991189, 90338345, 83257441,
+		80373285, 58617616, 64444167, 46709983, 50818468, 156040895,
+		57227415);
+	
+	for (id in ids, symbol in symbols, type in types, length in lengths)
+	{
+		initializeChromosome(id, length, type, symbol);
+		
+		// Read the recombination rate map from a file
+		recfile_path = CHR_PATH + "chr" + symbol + "_recombination.txt";
+		initializeRecombinationRateFromFile(recfile_path, length-1, scale=1.0, sep=",");
+		
+		// We use the same mutation rate for all chromosomes, but it could easily
+		// be configured with rate maps similarly to the recombination rate
+		initializeMutationRate(MU_CODING);
+		
+		// Read the genomic element structure of coding vs. non-coding regions
+		// from another file, which gives genomic element types and positions
+		gefile_path = CHR_PATH + "chr" + symbol + "_genomic_elements.txt";
+		ge_df = readCSV(gefile_path, colNames=c("id", "start", "end"));
+		ge_ids = ge_df.getValue("id");
+		ge_starts = ge_df.getValue("start");
+		ge_ends = ge_df.getValue("end");
+		coding = (ge_ids == 1);
+		initializeGenomicElement(1, ge_starts[coding], ge_ends[coding]);
+	}
+}
+
+1 early() {
+	// This version just simulates 500 individuals in a single subpop
+	sim.addSubpop("p1", 500);
+}
+
+2000 late() {
+}

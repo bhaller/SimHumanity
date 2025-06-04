@@ -1,0 +1,40 @@
+Simulation information:
+    Engine: slim (5.0)
+    Model id: OutOfAfrica_2T12
+    Model description: Two population out-of-Africa
+    Population: number_samples (sampling_time_generations):
+        AFR: 1 (0)
+        EUR: 2 (0)
+Contig Description:
+    Contig origin: chr1:0-248956422
+    Contig length: 248956422.0
+    Contig ploidy: 2
+    Mutation rate: 2.36e-08
+    Recombination rate: 1.1523470111585671e-08
+    Genetic map: HapMapII_GRCh38
+    DFE: PosNeg_R24
+    DFE applied to: ensembl_havana_104_CDS elements on chr1
+
+If you use this simulation in published work, please cite:
+[stdpopsim]
+Adrion et al., 2020: https://doi.org/10.7554/eLife.54967
+[stdpopsim]
+Lauterbur et al., 2023: https://doi.org/10.7554/eLife.84874
+[simulation engine]
+Haller et al., 2019: https://doi.org/10.1111/1755-0998.12968
+[generation time]
+Tremblay and Vézina, 2000: https://doi.org/10.1086/302770
+[population size]
+Takahata, 1993: https://doi.org/10.1093/oxfordjournals.molbev.a039995
+[genome assembly]
+International Human Genome Sequencing Consortium, 2001: http://dx.doi.org/10.1038/35057062
+[genetic map, recombination rate]
+The International HapMap Consortium, 2007: https://doi.org/10.1038/nature06258
+[demographic model]
+Tennessen et al., 2012: https://doi.org/10.1126/science.1219240
+[demographic model]
+Fu et al., 2013: https://doi.org/10.1038/nature11690
+[distribution of fitness effects]
+Rodrigues et al., 2024: https://doi.org/10.1093/genetics/iyae006
+[distribution of fitness effects]
+Castellano et al., 2019: https://doi.org/10.1534/genetics.119.302494

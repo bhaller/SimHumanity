@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# assume we are being run from the "stdpopsim extraction" directory
+cd "raw"
+
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr1 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr1.slim 2> chr1_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr2 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr2.slim 2> chr2_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr3 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr3.slim 2> chr3_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr4 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr4.slim 2> chr4_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr5 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr5.slim 2> chr5_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr6 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr6.slim 2> chr6_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr7 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr7.slim 2> chr7_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr8 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr8.slim 2> chr8_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr9 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr9.slim 2> chr9_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr10 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr10.slim 2> chr10_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr11 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr11.slim 2> chr11_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr12 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr12.slim 2> chr12_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr13 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr13.slim 2> chr13_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr14 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr14.slim 2> chr14_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr15 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr15.slim 2> chr15_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr16 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr16.slim 2> chr16_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr17 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr17.slim 2> chr17_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr18 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr18.slim 2> chr18_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr19 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr19.slim 2> chr19_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr20 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr20.slim 2> chr20_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr21 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr21.slim 2> chr21_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chr22 --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chr22.slim 2> chr22_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chrX --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chrX.slim 2> chrX_notes.txt
+stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chrY --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chrY.slim 2> chrY_notes.txt
+
+#stdpopsim does not have correct info for the mitochondrial DNA, that will have to be obtained elsewhere
+#stdpopsim -e slim --slim-script HomSap -g HapMapII_GRCh38 -c chrM --dfe PosNeg_R24 --dfe-annotation ensembl_havana_104_CDS -o foo.ts -d OutOfAfrica_2T12 AFR:1 EUR:2 > chrM.slim 2> chrM_notes.txt
