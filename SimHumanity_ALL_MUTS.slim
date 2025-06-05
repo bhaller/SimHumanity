@@ -13,13 +13,17 @@ initialize() {
 	// set the working directory to our data repository
 	defineConstant("REPO_PATH", "~/Documents/Research/MesserLab/SLiM_project/Publication 2025 HumanPopGen/SimHumanity/");
 	if (!fileExists(REPO_PATH))
-			stop("incorrect repository path");
+		stop("incorrect repository path");
 	setwd(REPO_PATH);
 	
 	// this is the subpath to the chromosome data files
 	defineConstant("CHR_PATH", "stdpopsim extraction/extracted/");
 	if (!fileExists(CHR_PATH))
-			stop("malformed repository; missing extracted data");
+		stop("malformed repository; missing extracted data");
+	
+	// enable modeling of explicit nucleotides; we won't actually use them,
+	// but they're there as a proof of concept, and for extra realism
+	initializeSLiMOptions(nucleotideBased=T);
 	
 	// enable separate sexes; we want to simulate sex chromosomes
 	initializeSex();
@@ -34,22 +38,27 @@ initialize() {
 	defineConstant("MU_NEUTR", MU_TOTAL - (MU_BENEF + MU_DELET));
 	
 	// mutation type m0 represents neutral mutations in non-coding regions
-	initializeMutationType("m0", 0.5, "f", 0.0);
+	initializeMutationTypeNuc("m0", 0.5, "f", 0.0);
 	
 	// mutation type m1 represents neutral mutations in coding regions
-	initializeMutationType("m1", 0.5, "f", 0.0);
+	initializeMutationTypeNuc("m1", 0.5, "f", 0.0);
 	
 	// mutation type m2 represents deleterious mutations
-	initializeMutationType("m2", 0.5, "g", -0.03, 0.16);
+	initializeMutationTypeNuc("m2", 0.5, "g", -0.03, 0.16);
 	
 	// mutation type m3 represents beneficial mutations
-   initializeMutationType("m3", 0.5, "e", 0.01);
+	initializeMutationTypeNuc("m3", 0.5, "e", 0.01);
+	
+	// we use the Jukes-Cantor mutational model with a constant mutation
+	// rate across all chromosomes, but this could easily be customized
+	// with different mutational models and with per-chromosome hotspot maps
+	mutMatrix = mmJukesCantor(MU_TOTAL / 3.0);
 	
 	// genomic element type g0 represents non-coding regions
-	initializeGenomicElementType("g0", m0, 1.0);
+	initializeGenomicElementType("g0", m0, 1.0, mutMatrix);
 	
 	// genomic element type g1 represents coding regions
-	initializeGenomicElementType("g1", c(m1, m2, m3), c(MU_NEUTR, MU_DELET, MU_BENEF));
+	initializeGenomicElementType("g1", c(m1, m2, m3), c(MU_NEUTR, MU_DELET, MU_BENEF), mutMatrix);
 	
 	// define the ids, symbols, types, and lengths of all chromosomes
 	ids = 1:24;
@@ -65,13 +74,12 @@ initialize() {
 	{
 		initializeChromosome(id, length, type, symbol);
 		
+		// use a random initial nucleotide sequence; this could be read from FASTA
+		initializeAncestralNucleotides(randomNucleotides(length));
+		
 		// Read the recombination rate map from a file
 		recfile_path = CHR_PATH + "chr" + symbol + "_recombination.txt";
 		initializeRecombinationRateFromFile(recfile_path, length-1, scale=1.0, sep=",");
-		
-		// We use the same mutation rate for all chromosomes, but it could easily
-		// be configured with rate maps similarly to the recombination rate
-		initializeMutationRate(MU_TOTAL);
 		
 		// Read the genomic element structure of coding vs. non-coding regions
 		// from another file, which gives genomic element types and positions
