@@ -1,10 +1,11 @@
-// SimHumanity_NON_NEUTRAL.slim
+// SimHumanity 3 - tree-seq version.slim
 //
 // By Ben Haller, 3 June 2025
 // Messer Lab, Cornell University
 
-// This simulates humans with full genomes.  This version simulates only
-// non-neutral mutations, in preparation for using tree-sequence recording.
+// This simulates humans with full genomes.  This version adds the use
+// of tree-sequence recording, as is accompanied by a Python script that
+// performs recapitation and neutral mutation overlay.
 
 // This model requires SLiM 5.0 or later to run.  For further information,
 // see the publication associated with this repository.
@@ -24,6 +25,9 @@ initialize() {
 	// enable modeling of explicit nucleotides; we won't actually use them,
 	// but they're there as a proof of concept, and for extra realism
 	initializeSLiMOptions(nucleotideBased=T);
+	
+	// turn on tree-sequence recording
+	initializeTreeSeq(simplificationInterval=250);
 	
 	// enable separate sexes; we want to simulate sex chromosomes
 	initializeSex();
@@ -100,4 +104,5 @@ initialize() {
 }
 
 2000 late() {
+	sim.treeSeqOutput("simhumanity trees");
 }
