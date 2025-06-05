@@ -104,5 +104,6 @@ initialize() {
 }
 
 2000 late() {
-	sim.treeSeqOutput("simhumanity trees");
+	// write out the final trees archive, overwriting an existing archive
+	sim.treeSeqOutput("simhumanity trees", overwriteDirectory=T);
 }
