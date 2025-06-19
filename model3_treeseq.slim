@@ -1,10 +1,11 @@
-// SimHumanity 1 - all mutations.slim
+// model3_treeseq.slim
 //
 // By Ben Haller, 3 June 2025
 // Messer Lab, Cornell University
 
-// This simulates humans with full genomes.  This version simulates all
-// mutations including neutral mutations, so it is pretty slow.
+// This simulates humans with full genomes.  This version adds the use
+// of tree-sequence recording, as is accompanied by a Python script that
+// performs recapitation and neutral mutation overlay.
 
 // This model requires SLiM 5.0 or later to run.  For further information,
 // see the publication associated with this repository.
@@ -25,6 +26,9 @@ initialize() {
 	// but they're there as a proof of concept, and for extra realism
 	initializeSLiMOptions(nucleotideBased=T);
 	
+	// turn on tree-sequence recording
+	initializeTreeSeq(simplificationInterval=250);
+	
 	// enable separate sexes; we want to simulate sex chromosomes
 	initializeSex();
 	
@@ -32,16 +36,17 @@ initialize() {
 	// from Rodrigues et al., 2024 (https://doi.org/10.1093/genetics/iyae006)
 	// MU_NEUTR is the neutral mutation rate within coding regions; in
 	// non-coding regions all mutations are neutral so it is MU_TOTAL
-	defineConstant("MU_TOTAL", 2.36e-08);
+	//defineConstant("MU_TOTAL", 2.36e-08);
 	defineConstant("MU_BENEF", 1e-12);
 	defineConstant("MU_DELET", 1.2e-8);
-	defineConstant("MU_NEUTR", MU_TOTAL - (MU_BENEF + MU_DELET));
+	//defineConstant("MU_NEUTR", MU_TOTAL - (MU_BENEF + MU_DELET));
+	defineConstant("MU_CODING", MU_BENEF + MU_DELET);
 	
 	// mutation type m0 represents neutral mutations in non-coding regions
-	initializeMutationTypeNuc("m0", 0.5, "f", 0.0);
+	//initializeMutationTypeNuc("m0", 0.5, "f", 0.0);
 	
 	// mutation type m1 represents neutral mutations in coding regions
-	initializeMutationTypeNuc("m1", 0.5, "f", 0.0);
+	//initializeMutationTypeNuc("m1", 0.5, "f", 0.0);
 	
 	// mutation type m2 represents deleterious mutations
 	initializeMutationTypeNuc("m2", 0.5, "g", -0.03, 0.16);
@@ -52,13 +57,13 @@ initialize() {
 	// we use the Jukes-Cantor mutational model with a constant mutation
 	// rate across all chromosomes, but this could easily be customized
 	// with different mutational models and with per-chromosome hotspot maps
-	mutMatrix = mmJukesCantor(MU_TOTAL / 3.0);
+	mutMatrix = mmJukesCantor(MU_CODING / 3.0);
 	
 	// genomic element type g0 represents non-coding regions
-	initializeGenomicElementType("g0", m0, 1.0, mutMatrix);
+	//initializeGenomicElementType("g0", m0, 1.0, mutMatrix);
 	
 	// genomic element type g1 represents coding regions
-	initializeGenomicElementType("g1", c(m1, m2, m3), c(MU_NEUTR, MU_DELET, MU_BENEF), mutMatrix);
+	initializeGenomicElementType("g1", c(m2, m3), c(MU_DELET, MU_BENEF), mutMatrix);
 	
 	// define the ids, symbols, types, and lengths of all chromosomes
 	ids = 1:24;
@@ -88,7 +93,8 @@ initialize() {
 		ge_ids = ge_df.getValue("id");
 		ge_starts = ge_df.getValue("start");
 		ge_ends = ge_df.getValue("end");
-		initializeGenomicElement(ge_ids, ge_starts, ge_ends);
+		coding = (ge_ids == 1);
+		initializeGenomicElement(1, ge_starts[coding], ge_ends[coding]);
 	}
 }
 
@@ -98,4 +104,6 @@ initialize() {
 }
 
 2000 late() {
+	// write out the final trees archive, overwriting an existing archive
+	sim.treeSeqOutput("simhumanity trees", overwriteDirectory=T);
 }
