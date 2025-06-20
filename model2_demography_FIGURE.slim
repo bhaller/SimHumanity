@@ -46,6 +46,8 @@ function (void)initializeGenomicElementsFromFile(string$ gpath)
 }
 
 initialize() {
+	setSeed(3868450400231210557);
+	
 	// Find our data repository and subpaths within it
 	defineRepositoryPaths();
 	
@@ -94,6 +96,7 @@ initialize() {
 	{
 // DEBUG CODE, REMOVE for production!
 //if (id != 22) next;
+//if ((id > 22) | (id < 15)) next;
 
 		initializeChromosome(id, length, type, symbol);
 		
@@ -156,6 +159,45 @@ initialize() {
 	p3.setSubpopulationSize(asInteger(p3_size));
 }
 
-// OUTPUT AND TERMINATE
-79024 late() {
+
+// Additional code to produce Fig. 1
+
+1:79024 late() {
+	if (!exists("slimgui"))
+		stop("This version of the model must be run under SLiMgui.");
+	
+	// Create (or re-create) our plot window
+	chrs = sim.chromosomes;
+	totalLength = sum(chrs.length);
+	cumulativeLengths = cumSum(chrs.length);
+	chrs.setValuesVectorized("basePosition", cumulativeLengths - chrs[0].length);
+	
+	plot = slimgui.createPlot(title="Fixed beneficial mutations",
+		xrange=c(1, 79024), yrange=c(0, totalLength - 1),
+		xlab="Generation", ylab="Position",
+		width=1200, height=400, axisLabelSize=20, tickLabelSize=13);
+	plot.axis(1, seq(0, 79000, by=5000));
+	plot.axis(2, c(0, cumulativeLengths), rep("", length(chrs) + 1));
+	
+	plot.lines(x=c(0,0), y=c(1, 79024));
+	plot.abline(h=c(0, cumulativeLengths), color="gray");
+	
+	prevEnd = 0;
+	for (chr in sim.chromosomes)
+	{
+		nextEnd = prevEnd + chr.length;
+		x = (chr.id % 2 == 0) ? -1100 else -2300;
+		plot.text(x, mean(c(prevEnd, nextEnd)), chr.symbol, adj=c(0.5, 0.5));
+		prevEnd = nextEnd;
+	}
+	
+	subs = sim.substitutionsOfType(m2);
+	
+	if (length(subs))
+	{
+		positions = subs.position + subs.chromosome.getValue("basePosition");
+		
+		for (sub in subs, pos in positions)
+			plot.lines(x=c(sub.originTick, sub.fixationTick), y=c(pos, pos), lwd=2);
+	}
 }
