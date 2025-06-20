@@ -1,4 +1,4 @@
-// model1_foundation.slim
+// model1_foundation_FIGURE.slim
 //
 // By Ben Haller, 3 June 2025
 // Messer Lab, Cornell University
@@ -92,6 +92,9 @@ initialize() {
 	
 	for (id in ids, symbol in symbols, type in types, length in lengths)
 	{
+// DEBUG CODE, REMOVE for production!
+if (id != 22) next;
+
 		initializeChromosome(id, length, type, symbol);
 		
 		// Use a random initial nucleotide sequence; this could be read from FASTA
@@ -121,4 +124,95 @@ initialize() {
 }
 
 10*N late() {
+}
+
+
+// Additional code to produce Fig. 1
+
+// This normalizes an SFS to convert it to density
+function (numeric)normalizeSFS(numeric sfs)
+{
+	return sfs / sum(sfs);
+}
+
+// This combines adjacent SFS bins to decrease noise
+function (numeric)rebinSFS(numeric sfs, integer$ binWidth)
+{
+	originalCount = length(sfs);
+	newCount = integerDiv(originalCount, binWidth);		// rounds down
+	rebinned = rep(0, newCount);
+	for (mod in 0:(binWidth - 1))
+		rebinned = rebinned + sfs[mod + (0:(newCount-1)) * binWidth];
+	return rebinned;
+}
+
+1 late() {
+	if (!exists("slimgui"))
+		stop("This version of the model must be run under SLiMgui.");
+	
+	// The original SFS has count bins from 1 to 2N-1; we combine adjacent bins
+	defineConstant("SFS_MAX_COUNT", 2*N - 1);
+	defineConstant("SFS_COUNTS", 1:SFS_MAX_COUNT);
+	defineConstant("BIN_WIDTH", 4);
+	defineConstant("BIN_COUNT", integerDiv(SFS_MAX_COUNT, BIN_WIDTH));
+	defineConstant("SFS_BINS", 1:BIN_COUNT);
+	
+	// Ticks at which to plot
+	defineConstant("PLOT_TICKS", seq(from=2*N, to=10*N, by=2*N));
+	
+	// Calculate the expected SFS
+	expected = 1 / (1:SFS_MAX_COUNT);
+	expected_density = normalizeSFS(expected);
+	expected_rebin = normalizeSFS(rebinSFS(expected, BIN_WIDTH));
+	
+	// Create our first plot window
+	plot1 = slimgui.createPlot(title="SFS ~ Generation",
+		xrange=c(1, 10), yrange=c(0, 0.20),
+		xlab="Allele count", ylab="Density",
+		width=600, height=400, axisLabelSize=20, tickLabelSize=13);
+	plot1.axis(1, 1:10);
+	plot1.axis(2, c(0, 0.1, 0.2));
+	plot1.addLegend("topRight", labelSize=13);
+	
+	plot1.lines(x=SFS_COUNTS, y=expected_density, color="black", lwd=4.0);
+	plot1.legendLineEntry("Expected SFS", color="black", lwd=4.0);
+	
+	// Create our second plot window
+	plot2 = slimgui.createPlot(title="SFS ~ Generation (log-transformed)",
+		xrange=c(1, BIN_COUNT), yrange=c(-11, 0),
+		xlab="Allele frequency (binned)", ylab="Density (log-transformed)",
+		width=600, height=400, axisLabelSize=20, tickLabelSize=13);
+	plot2.axis(1, c(1, BIN_COUNT), c("lowest", "highest"));
+	plot2.axis(2, seq(-10, 0, by=2));
+	plot2.addLegend("topRight", labelSize=13);
+	
+	plot2.lines(x=SFS_BINS, y=log(expected_rebin), color="black", lwd=4.0);
+	plot2.legendLineEntry("Expected SFS", color="black", lwd=4.0);
+}
+
+PLOT_TICKS late() {
+	// Figure out the color we want to plot in, and calculate our color
+	index = which(community.tick == PLOT_TICKS);
+	color = colors(length(PLOT_TICKS) + 2, "turbo")[index + 1];	// exclude ends
+	
+	// Calculate the SFS, across autosomes, and normalize to get densities
+	sfs = rep(0, SFS_MAX_COUNT);
+	for (chr in sim.chromosomesOfType("A"))
+	{
+		haplosomes = p1.haplosomesForChromosomes(chr);
+		muts = sim.subsetMutations(mutType=m0, chromosome=chr);
+		chr_sfs = calcSFS(NULL, haplosomes, muts, "count");
+		sfs = sfs + chr_sfs;
+	}
+	sfs_density = normalizeSFS(sfs);
+	sfs_rebin = normalizeSFS(rebinSFS(sfs, BIN_WIDTH));
+	
+	// Add a line to the plots
+	plot1 = slimgui.plotWithTitle("SFS ~ Generation");
+	plot1.lines(x=SFS_COUNTS, y=sfs_density, color=color, lwd=2.0);
+	plot1.legendLineEntry("Gen. " + community.tick, color=color, lwd=2.0);
+	
+	plot2 = slimgui.plotWithTitle("SFS ~ Generation (log-transformed)");
+	plot2.lines(x=SFS_BINS, y=log(sfs_rebin), color=color, lwd=2.0);
+	plot2.legendLineEntry("Gen. " + community.tick, color=color, lwd=2.0);
 }
