@@ -59,7 +59,7 @@ initialize() {
 	// from Rodrigues et al., 2024 (https://doi.org/10.1093/genetics/iyae006)
 	// MU_NEUTR is the neutral mutation rate within coding regions; in
 	// non-coding regions all mutations are neutral so it uses MU_TOTAL
-	defineConstant("MU_TOTAL", 2.36e-08);
+	defineConstant("MU_TOTAL", 2.0e-8);
 	defineConstant("MU_BENEF", 1e-12);
 	defineConstant("MU_DELET", 1.2e-8);
 	defineConstant("MU_NEUTR", MU_TOTAL - (MU_BENEF + MU_DELET));

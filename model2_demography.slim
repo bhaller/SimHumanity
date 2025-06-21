@@ -59,7 +59,7 @@ initialize() {
 	// from Rodrigues et al., 2024 (https://doi.org/10.1093/genetics/iyae006)
 	// MU_NEUTR is the neutral mutation rate within coding regions; in
 	// non-coding regions all mutations are neutral so it uses MU_TOTAL
-	//defineConstant("MU_TOTAL", 2.36e-08);
+	//defineConstant("MU_TOTAL", 2.0e-8);
 	defineConstant("MU_BENEF", 1e-12);
 	defineConstant("MU_DELET", 1.2e-8);
 	//defineConstant("MU_NEUTR", MU_TOTAL - (MU_BENEF + MU_DELET));
@@ -92,9 +92,6 @@ initialize() {
 	
 	for (id in ids, symbol in symbols, type in types, length in lengths)
 	{
-// DEBUG CODE, REMOVE for production!
-//if (id != 22) next;
-
 		initializeChromosome(id, length, type, symbol);
 		
 		// Use a random initial nucleotide sequence; this could be read from FASTA
@@ -148,7 +145,7 @@ initialize() {
 
 // EXPONENTIAL GROWTH in Europe (p2) and East Asia (p3)
 78084:79024 early() {
-	t = sim.cycle - 78084;
+	t = community.tick - 78084;
 	p2_size = round(1032.1046957333444 * (1 + 0.003784324268)^t);
 	p3_size = round(553.8181989 * (1 + 0.004780219543)^t);
 	
