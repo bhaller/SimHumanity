@@ -176,7 +176,7 @@ initialize() {
 		xrange=c(1, 79024), yrange=c(0, totalLength - 1),
 		xlab="Generation", ylab="Position",
 		width=1200, height=400, axisLabelSize=20, tickLabelSize=13);
-	plot.axis(1, seq(0, 79000, by=5000));
+	plot.axis(1, c(seq(0, 79000, by=5000), 79024);
 	plot.axis(2, c(0, cumulativeLengths), rep("", length(chrs) + 1));
 	
 	plot.lines(x=c(0,0), y=c(1, 79024));
