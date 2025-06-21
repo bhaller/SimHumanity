@@ -43,6 +43,9 @@ function (void)initializeGenomicElementsFromFile(string$ gpath)
 }
 
 initialize() {
+	// this seed value was used to produce Fig. 1 in SLiM 5.0
+	setSeed(1);
+	
 	// Find our data repository and subpaths within it
 	defineRepositoryPaths();
 	

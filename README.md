@@ -23,7 +23,9 @@ In particular, it contains:
 
 - `model3_treeseq.slim` : the third version of the SimHumanity model presented in the paper (Code Sample 3)
 
-- `model3_analysis.py` : a Python script that performs recapitation, neutral mutation overlay, and analysis for the trees archive produced by `model3_treeseq.slim`, leading to Fig. 3
+- `model3_treeseq_FIGURE.slim` : an extended version of `model3_treeseq.slim` that sets the seed value used to produce Fig. 3
+
+- `model3_analysis.py` : a Python script that performs recapitation, neutral mutation overlay, and analysis for the trees archive produced by `model3_treeseq_FIGURE.slim`, leading to Fig. 3
 
 - `stdpopsim extraction` : a folder containing genetic structure data for all chromosomes except the mtDNA, together with scripts and materials for extracting that genetic structure data from `stdpopsim`
 
