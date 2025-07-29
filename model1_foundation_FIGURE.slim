@@ -112,9 +112,10 @@ initialize() {
 	
 	// Handle the mtDNA separately since its data is in a different place
 	// It also loads a FASTA file for its sequence, as a proof of concept
-	initializeChromosome(25, 16569, "HF", "MT");
+	mtChromosome = initializeChromosome(25, 16569, "HF", "MT");
 	initializeAncestralNucleotides(MT_PATH + "mtDNA_MOD.FASTA");
 	initializeRecombinationRate(0.0);
+	initializeHotspotMap(20.0, mtChromosome.lastPosition);
 	initializeGenomicElementsFromFile(MT_PATH + "chrMT_genomic_elements.txt");
 }
 
@@ -165,7 +166,8 @@ function (numeric)rebinSFS(numeric sfs, integer$ binWidth)
 	expected_density = normalizeSFS(expected);
 	expected_rebin = normalizeSFS(rebinSFS(expected, BIN_WIDTH));
 	
-	// Create our first plot window
+	// Create our first plot window (not published)
+	// This is an untransformed SFS
 	plot1 = slimgui.createPlot(title="SFS ~ Generation",
 		xrange=c(1, 10), yrange=c(0, 0.20),
 		xlab="Allele count", ylab="Density",
@@ -177,7 +179,8 @@ function (numeric)rebinSFS(numeric sfs, integer$ binWidth)
 	plot1.lines(x=SFS_COUNTS, y=expected_density, color="black", lwd=4.0);
 	plot1.legendLineEntry("Expected SFS", color="black", lwd=4.0);
 	
-	// Create our second plot window
+	// Create our second plot window (published)
+	// This is a log-transformed SFS
 	plot2 = slimgui.createPlot(title="SFS ~ Generation (log-transformed)",
 		xrange=c(1, BIN_COUNT), yrange=c(-11, 0),
 		xlab="Allele frequency (binned)", ylab="Density (log-transformed)",

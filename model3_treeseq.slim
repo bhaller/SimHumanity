@@ -114,9 +114,10 @@ initialize() {
 	
 	// Handle the mtDNA separately since its data is in a different place
 	// It also loads a FASTA file for its sequence, as a proof of concept
-	initializeChromosome(25, 16569, "HF", "MT");
+	mtChromosome = initializeChromosome(25, 16569, "HF", "MT");
 	initializeAncestralNucleotides(MT_PATH + "mtDNA_MOD.FASTA");
 	initializeRecombinationRate(0.0);
+	initializeHotspotMap(20.0, mtChromosome.lastPosition);
 	initializeGenomicElementsFromFile(MT_PATH + "chrMT_genomic_elements.txt");
 }
 
