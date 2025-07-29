@@ -1,4 +1,7 @@
 # exclude this folder, which is output from model 3
 simhumanity_trees
 simhumanity_trees.zip
+
+# exclude trees files and the macOS Finder cruft .DS_Store
 *.trees
+.DS_Store
