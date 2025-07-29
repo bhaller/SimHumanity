@@ -3,7 +3,11 @@
 # Benjamin C. Haller, 22 June 2025
 #
 # This R script has the raw data for all beneficial substitutions from model 2 (as shown in Fig. 2).
-# After getting the data into a usable form, maybe we can find something to do with it...?
+# After getting the data into a usable form, maybe we can find something to do with it...?  This
+# really goes beyond the scope of the paper, though; we're not trying to find interesting results,
+# we're just trying to show off the models themselves.  So this is not for publication, just for fun.
+
+library("viridis")
 
 
 # raw data from the end of model 2, for all beneficial substitutions
@@ -19,22 +23,138 @@ chromosome_id <- as.integer(unlist(strsplit("2 15 3 16 4 15 1 16 7 3 8 23 5 12 1
 selCoeff <- as.numeric(unlist(strsplit("0.0595978 0.0599581 0.0166352 0.0217045 0.025834 0.0167896 0.0150626 0.0613304 0.0188746 0.0193862 0.0668587 0.0274547 0.0112942 0.0229247 0.0272316 0.0234874 0.0128678 0.0141726 0.0230567 0.010192 0.0134355 0.0160838 0.00956602 0.0169571 0.01791 0.0535819 0.0176273 0.00737213 0.0218966 0.0179122 0.0149775 0.0159811 0.0128594 0.0633983 0.00337142 0.0095331 0.0124279 0.0266685 0.00768812 0.0155928 0.0145046 0.0375052 0.0337648 0.0210831 0.0319835 0.0498791 0.0264579 0.0112868 0.00436924 0.00551458 0.0126734 0.0275517 0.00829173 0.0089985 0.00771338 0.0122743 0.0171725 0.0417682 0.0168099 0.0107849 0.0273153 0.0192824 0.0189015 0.0108837 0.0648453 0.0486597 0.0392074 0.00948204 0.0318742 0.0130972 0.0269885 0.00206761 0.0420745 0.0149727 0.0250758 0.0115151 0.00729621 0.0179832 0.0276835 0.0176153 0.0146587 0.005797 0.00735464 0.0183327 0.015841 0.0447407 0.0555374 0.0123465 0.0289413 0.0154695 0.0231267 0.0109511 0.0521855 0.0343899 0.0239659 0.0099741 0.00785589 0.00775799 0.0140556 0.0103375 0.00876042 0.00539538 0.0073389 0.0293021 0.00570399 0.0122117 0.0161782 0.0438213 0.010909 0.0101513 0.0141637 0.0513828 0.0171013 0.0721368 0.0169344 0.0178922 0.0119934 0.0220726 0.00606197 0.0446247 0.00327453 0.0331893 0.0152789 0.0317298 0.0372695 0.0127071 0.0168182 0.00817807 0.0273666 0.02549 0.0268592 0.027808 0.0211888 0.00811952 0.0109679 0.0284315 0.0185599 0.027865 0.0196025 0.0143433 0.0289634 0.0292531 0.0238863 0.0094182 0.00624751 0.018029 0.00122763 0.00575802 0.0121238 0.0196469 0.0029039 0.022531 0.0226333 0.0100916 0.021008 0.0412437 0.00587817 0.0532713 0.0442803 0.0121124 0.00719586 0.0312 0.0196104 0.0128334 0.0443914 0.0327938 0.00557833 0.0507024 0.0226768 0.00809424 0.0235665 0.0132305 0.00830877 0.0162367 0.011161 0.0160562 0.032661 0.0181471 0.0166119 0.0052867 0.0373468 0.00735117 0.0190405 0.0136975 0.0181097 0.0263648 0.00911176 0.00178383 0.00461205 0.00619667 0.00923338 0.038456 0.014489 0.0442084 0.0279448 0.0226658 0.00784643 0.0172844 0.0184374 0.00849571 0.0108547 0.0416662 0.0067952 0.00680919 0.0210324 0.0295103 0.0208832 0.0334648 0.0105125 0.0128002 0.0137497 0.0146329 0.0386155 0.0399474 0.00907881 0.043401 0.0167949 0.0266239 0.0478359 0.0205671 0.0394587 0.0285919 0.0152928 0.00832666 0.0107689 0.0129391 0.0142846 0.0273403 0.0179678 0.0349511 0.0242808 0.0388194 0.0199119 0.0128903 0.00772244 0.025691 0.0235055 0.00562008 0.00559718 0.0203246 0.00322504 0.0208423 0.00534103 0.0414821 0.00490949 0.0179651 0.00968422 0.0279952 0.0534476 0.007021 0.0134577 0.0141954 0.0388695 0.0087847 0.00650771 0.024995 0.0198289 0.0120916 0.029153 0.0138397 0.0271629 0.0217083 0.0197419 0.0448412 0.0103255 0.0216608 0.01747 0.0239336 0.0159095 0.104466 0.0170334 0.0204022 0.00787911 0.0191315 0.0036511 0.00404011 0.0129261 0.0311549 0.0124315 0.0144405 0.0028759 0.00442625 0.0234281 0.0605572 0.0143751 0.018554 0.00735887 0.00485108 0.00446721 0.0238171 0.0136759 0.0232173 0.00325374 0.0147937 0.0278773 0.0190809 0.00980205 0.031328 0.0143876 0.0110028 0.0370901 0.0216144 0.00998591 0.00499514 0.00616508 0.0406709 0.0156651 0.0123109 0.00987693 0.045789 0.00357787 0.00635045 0.0261694 0.0415091 0.0321655 0.0126608 0.00709681 0.022942 0.0705601 0.0239266 0.0207119 0.0194936 0.0289651 0.0310462 0.017564 0.00878504 0.00985908 0.062642 0.0170696 0.0178221 0.0288795 0.014452 0.0215577 0.0154955 0.0272712 0.00461181 0.00597055 0.022982 0.0138074 0.0307008 0.0102282 0.0167018 0.0112879 0.0174349 0.0121656 0.00710115 0.0244899 0.0135602 0.00742599 0.0353865 0.00836166 0.0274737 0.0246657 0.0139729 0.00437967 0.0627025 0.0467804 0.0089584 0.023906 0.00392254 0.0164205 0.00358769 0.0178348 0.00974625", " ", fixed=T)))
 
 
-# try plotting things
+# plot the duration of a sweep against its selection coefficient; a larger selection coefficient should tend to produce a faster sweep
 
 duration <- fixationTick - originTick
 
-plot(x=duration, y=selCoeff, pch=19, cex=0.3, col="red")
+plot(x=selCoeff, y=duration, pch=19, cex=0.3, col="red")
 
 
+# add colors to the previous plot indicating how many other sweeps were happening at the same time
+
+duration <- fixationTick - originTick
+
+sweepCount <- NULL
+
+for (i in seq_along(duration))
+{
+	this_origin <- originTick[i]
+	this_fixation <- fixationTick[i]
+	simultaneous <- (originTick <= this_fixation) & (fixationTick >= this_origin) & (seq_along(duration) != i)
+	sweepCount <- c(sweepCount, sum(simultaneous))
+}
+
+maxCount <- max(sweepCount)
+colors <- plasma(maxCount + 1)
+
+plot(x=selCoeff, y=duration, pch=19, cex=0.3, col=colors[sweepCount + 1])
 
 
+# instead, color by how much time is spent shared with other sweeps, weighted by the selection coefficients of those sweeps
+
+duration <- fixationTick - originTick
+
+sweepWeight <- NULL
+
+for (i in seq_along(duration))
+{
+	this_origin <- originTick[i]
+	this_fixation <- fixationTick[i]
+	is_simultaneous <- (originTick <= this_fixation) & (fixationTick >= this_origin) & (seq_along(duration) != i)
+	
+	# this narrows down to just sweeps on the same chromosome; physical linkage should be important
+	is_simultaneous <- is_simultaneous & (chromosome_id == chromosome_id[i])
+	
+	simul_origin <- originTick[is_simultaneous]
+	simul_fix <- fixationTick[is_simultaneous]
+	overlap <- pmin(this_fixation, simul_fix) - pmax(this_origin, simul_origin)
+	weighted_overlap <- overlap * selCoeff[is_simultaneous]
+	sweepWeight <- c(sweepWeight, sum(weighted_overlap))
+}
+
+# scale sweepWeight values by the duration of the focal mutation; the question is, *per* unit time
+# spent sweeping, how many other sweeps are you sharing your duration with?
+sweepWeight <- sweepWeight / (fixationTick - originTick)
+
+# let's try a sqrt transform to bring out the detail at the low end more
+sweepWeight <- sqrt(sweepWeight)
+
+maxWeight <- max(sweepWeight)
+colors <- plasma(100)
+
+plot(x=selCoeff, y=duration, pch=19, cex=0.3, col=colors[(sweepWeight / maxWeight) * 99 + 1])
 
 
+# this adds a color stripe showing the scale of the sweepWeight colors; toward black is a very low
+# sweepWeight value, indicating that the sweep proceeded by itself, whereas towards yellow is a
+# high sweepWeight value, indicating that the sweep was accompanied by many other sweeps
+for (i in 0:99)
+{
+	bottom <- 3000 + (9000-3000) * (i / 100)
+	top <- 3000 + (9000-3000) * ((i + 1) / 100)
+	rect(xleft=0.10, ybottom=bottom, xright=0.105, ytop=top, col=colors[i+1], border=NA)
+}
+rect(xleft=0.10, ybottom=3000, xright=0.105, ytop=9000, border="black")
 
 
+# this function is thanks to P. Messer, adapted a bit for use here; it simulates a bunch of sweep
+# trajectories for the given parameters and returns the mean fixation time across 1000 runs
+mean_fixation_time <- function(N, h, s)
+{
+	times <- c()
+	
+	i<-0
+	
+	while(i<1000)
+	{
+	  x <- 1/(2*N)
+	  t <- 1
+	
+	  while(x>0 && x<1-1.000001/(2*N))		# allow for a bit of numerical error
+	  {
+	    #p <- ((1+s)*x^2 + (1+h*s)*x*(1-x)) / ((1+s)*x^2 + (1+h*s)*2*x*(1-x) + (1-x)^2)
+	    p <- (1+h*s)*x/(1+h*s*x)
+	    n <- rbinom(1,2*N,p)
+	    x <- n/(2*N)
+	    t <- t+1
+	  }
+	  
+	  if(x>0) 
+	  { 
+	    i <- i+1
+	    times <- c(times,t) 
+	  }
+	}
+	return(mean(times));
+}
+
+time <- mean_fixation_time(N=7310, h=0.5, s=0.11)
+print(time)
 
 
+# use the above function to simulate sweeps for the range of s values spanning the plot
+# note that this takes some time to complete; be patient!  :->?
+Ne <- 7310	# the value of N for the bulk of the African population stage
+selCoeffs <- seq(from=0.001, to=0.11, by=0.001)
+expectedDurations <- sapply(selCoeffs, FUN = function(s) { mean_fixation_time(Ne, 0.5, s) })
 
+lines(x=selCoeffs, y=expectedDurations, lwd=1.0, col="red")
+
+
+# So, some partial conclusions.  It is certainly apparent that the low-s mutations are more likely to
+# sweep together with other mutations.  But is this because for low s, you're likely to be lost unless
+# you get helped by another sweep?  Or is this because for low s, your sweep duration is longer, and so
+# you share your duration with more other sweeps just due to that?  I added the line:
+#
+#	sweepWeight <- sweepWeight / (fixationTick - originTick)
+#
+# to answer this, and with that line added, the pattern seems to me to disappear, although one would
+# have to do stats to be sure.  But it doesn't look like there's a strong effect of needing help to
+# complete for small s, nor does it look like there's a strong pattern of sweeping faster with other
+# sweeps than by yourself.  Maybe a little bit, but not super obviously.
+#
+# The remaining question is why ALL of these sweeps are so much faster than expected according to
+# the -4*Ne*ln(s) equation.  Perhaps I'm just using it wrong.
 
 
 
