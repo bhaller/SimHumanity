@@ -133,7 +133,7 @@ print(time)
 
 
 # use the above function to simulate sweeps for the range of s values spanning the plot
-# note that this takes some time to complete; be patient!  :->?
+# note that this takes some time to complete; be patient!  :->
 Ne <- 7310	# the value of N for the bulk of the African population stage
 selCoeffs <- seq(from=0.001, to=0.11, by=0.001)
 expectedDurations <- sapply(selCoeffs, FUN = function(s) { mean_fixation_time(Ne, 0.5, s) })
@@ -152,9 +152,6 @@ lines(x=selCoeffs, y=expectedDurations, lwd=1.0, col="red")
 # have to do stats to be sure.  But it doesn't look like there's a strong effect of needing help to
 # complete for small s, nor does it look like there's a strong pattern of sweeping faster with other
 # sweeps than by yourself.  Maybe a little bit, but not super obviously.
-#
-# The remaining question is why ALL of these sweeps are so much faster than expected according to
-# the -4*Ne*ln(s) equation.  Perhaps I'm just using it wrong.
 
 
 
