@@ -1,0 +1,164 @@
+// model2_demography.slim
+//
+// By Ben Haller, 3 June 2025
+// Messer Lab, Cornell University
+
+// This simulates humans with full genomes.  This version adds in the
+// demographic model of Gravel (2011).  In addition, it simulates only
+// non-neutral mutations, in preparation for using tree-seq recording.
+//
+// NOTE: This WITH_NEUTRAL version is a special version of model 2 that
+// still includes neutral mutations, as in model 1.  This is to see how
+// long model 2 takes to run if it includes neutral mutations as well.
+// This is not the publication version of model 2!
+
+// This model requires SLiM 5.0 or later to run.  For further information,
+// see the publication associated with this repository.
+
+
+// This user-defined function sets up paths for our data repository
+// NOTE: the base repository path needs to be configured for your setup here!
+function (void)defineRepositoryPaths(void)
+{
+	// Set the working directory to our data repository
+	defineConstant("REPO_PATH", "/Users/bhaller/Desktop/SimHumanity/");
+	if (!fileExists(REPO_PATH))
+		stop("incorrect repository path");
+	setwd(REPO_PATH);
+	
+	// This is the subpath to the nuclear chromosome data files
+	defineConstant("CHR_PATH", "stdpopsim extraction/extracted/");
+	if (!fileExists(CHR_PATH))
+		stop("malformed repository; missing extracted data");
+	
+	// This is the subpath to the mtDNA data files
+	defineConstant("MT_PATH", "mtDNA info/");
+	if (!fileExists(MT_PATH))
+		stop("malformed repository; missing mitochondrial data");
+}
+
+// This loads genetic element data from `path` using readCSV() to configure
+// the chromosome as a mosaic of coding (g1) and non-coding (g0) regions
+// NOTE: in this version of the model, we don't define g0 regions at all.
+function (void)initializeGenomicElementsFromFile(string$ gpath)
+{
+	ge_df = readCSV(gpath, colNames=c("id", "start", "end"));
+	ge_ids = ge_df.getValue("id");
+	ge_starts = ge_df.getValue("start");
+	ge_ends = ge_df.getValue("end");
+	coding = (ge_ids == 1);
+	initializeGenomicElement(1, ge_starts[coding], ge_ends[coding]);
+}
+
+initialize() {
+	// Find our data repository and subpaths within it
+	defineRepositoryPaths();
+	
+	// Enable modeling of explicit nucleotides
+	initializeSLiMOptions(nucleotideBased=T);
+	
+	// Enable separate sexes; we want to simulate sex chromosomes
+	initializeSex();
+	
+	// Define constants for the DFE that stdpopsim calls "PosNeg_R24",
+	// from Rodrigues et al., 2024 (https://doi.org/10.1093/genetics/iyae006)
+	// MU_NEUTR is the neutral mutation rate within coding regions; in
+	// non-coding regions all mutations are neutral so it uses MU_TOTAL
+	defineConstant("MU_TOTAL", 2.0e-8);
+	defineConstant("MU_BENEF", 1e-12);
+	defineConstant("MU_DELET", 1.2e-8);
+	defineConstant("MU_NEUTR", MU_TOTAL - (MU_BENEF + MU_DELET));
+	
+	// Mutation type m0: neutral mutations
+	// Mutation type m1: deleterious mutations
+	// Mutation type m2: beneficial mutations
+	initializeMutationTypeNuc("m0", 0.5, "f", 0.0);
+	initializeMutationTypeNuc("m1", 0.5, "g", -0.03, 0.16);
+	initializeMutationTypeNuc("m2", 0.5, "e", 0.01);
+	
+	// We use the Jukes-Cantor mutational model with a constant mutation rate
+	mutMatrix = mmJukesCantor(MU_TOTAL / 3.0);
+	
+	// Genomic element type g0: non-coding regions
+	// Genomic element type g1: coding regions
+	initializeGenomicElementType("g0", m0, 1.0, mutMatrix);
+	initializeGenomicElementType("g1", c(m0, m1, m2),
+		c(MU_NEUTR, MU_DELET, MU_BENEF), mutMatrix);
+	
+	// Define the ids, symbols, types, and lengths of all nuclear chromosomes
+	ids = 1:24;
+	symbols = c(1:22, "X", "Y");
+	types = c(rep("A", 22), "X", "Y");
+	lengths = c(248956422, 242193529, 198295559, 190214555, 181538259,
+		170805979, 159345973, 145138636, 138394717, 133797422, 135086622,
+		133275309, 114364328, 107043718, 101991189, 90338345, 83257441,
+		80373285, 58617616, 64444167, 46709983, 50818468, 156040895,
+		57227415);
+	
+	for (id in ids, symbol in symbols, type in types, length in lengths)
+	{
+		initializeChromosome(id, length, type, symbol);
+		
+		// Use a random initial nucleotide sequence; this could be read from FASTA
+		initializeAncestralNucleotides(randomNucleotides(length));
+		
+		// Read the recombination rate map from a file
+		rpath = CHR_PATH + "chr" + symbol + "_recombination.txt";
+		initializeRecombinationRateFromFile(rpath, length-1, scale=1.0, sep=",");
+		
+		// Read the genomic element structure of coding vs. non-coding regions
+		// from another file, which gives genomic element types and positions
+		gpath = CHR_PATH + "chr" + symbol + "_genomic_elements.txt";
+		initializeGenomicElementsFromFile(gpath);
+	}
+	
+	// Handle the mtDNA separately since its data is in a different place
+	// It also loads a FASTA file for its sequence, as a proof of concept
+	mtChromosome = initializeChromosome(25, 16569, "HF", "MT");
+	initializeAncestralNucleotides(MT_PATH + "mtDNA_MOD.FASTA");
+	initializeRecombinationRate(0.0);
+	initializeHotspotMap(20.0, mtChromosome.lastPosition);
+	initializeGenomicElementsFromFile(MT_PATH + "chrMT_genomic_elements.txt");
+}
+
+// INITIALIZE the ancestral African population
+1 early() {
+	sim.addSubpop("p1", asInteger(round(7310.370867595234)));
+}
+
+// END BURN-IN; EXPAND the African population
+73105 early() {
+	p1.setSubpopulationSize(asInteger(round(14474.54608753566)));
+}
+
+// SPLIT Eurasians (p2) from Africans (p1) and SET UP MIGRATION between them
+76968 early() {
+	sim.addSubpopSplit("p2", asInteger(round(1861.288190027689)), p1);
+	p1.setMigrationRates(c(p2), c(15.24422112e-5));
+	p2.setMigrationRates(c(p1), c(15.24422112e-5));
+}
+
+// SPLIT p2 into European (p2) and East Asian (p3) subpopulations;
+// RESIZE p2 to reflect the split; SET UP MIGRATION between them
+78084 early() {
+	sim.addSubpopSplit("p3", asInteger(round(553.8181989)), p2);
+	p2.setSubpopulationSize(asInteger(round(1032.1046957333444)));
+	
+	p1.setMigrationRates(c(p2, p3), c(2.54332678e-5, 0.7770583877e-5));
+	p2.setMigrationRates(c(p1, p3), c(2.54332678e-5, 3.115817913e-5));
+	p3.setMigrationRates(c(p1, p2), c(0.7770583877e-5, 3.115817913e-5));
+}
+
+// EXPONENTIAL GROWTH in Europe (p2) and East Asia (p3)
+78084:79024 early() {
+	t = community.tick - 78084;
+	p2_size = round(1032.1046957333444 * (1 + 0.003784324268)^t);
+	p3_size = round(553.8181989 * (1 + 0.004780219543)^t);
+	
+	p2.setSubpopulationSize(asInteger(p2_size));
+	p3.setSubpopulationSize(asInteger(p3_size));
+}
+
+// OUTPUT AND TERMINATE
+79024 late() {
+}
