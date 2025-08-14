@@ -1,14 +1,22 @@
-// model3_analysis.py.slim
-//
-// By Ben Haller, 22 June 2025
-// Messer Lab, Cornell University
+# model3_analysis.py
+#
+# By Ben Haller, 22 June 2025
+# Messer Lab, Cornell University
+
+# note that this requires pyslim 1.2 to run!
 
 from pathlib import Path
-import tskit, msprime, pyslim
+import tskit, msprime, pyslim, warnings
+from timeit import default_timer as timer
 
 
-// NOTE: the base repository path needs to be configured for your setup here!
+# NOTE: the base repository path needs to be configured for your setup here!
 directory_path = Path('/Users/bhaller/Documents/Research/MesserLab/SLiM_project/Publication 2025 HumanPopGen/SimHumanity/simhumanity_trees')
+
+# suppress time unit warnings from msprime; one generation equals one tick in this model, so it is fine
+warnings.simplefilter('ignore', msprime.TimeUnitsMismatchWarning)
+
+start = timer()
 
 try:
     # iterate over the .trees files in the trees archive, in alphabetical order
@@ -18,15 +26,19 @@ try:
             print(f"   loading...")
             ts = tskit.load(file_path)
             
-            # this errors, which I think is due to a bug in pyslim; stay tuned
+            # ********** TO DO: need to use the correct recombination rate map, as in the SLiM model!
             print(f"   recapitating...")
             ts = pyslim.recapitate(ts, ancestral_Ne=7310, recombination_rate=1e-8, random_seed=1)
             
             print(f"   computing diversity(mode='branch')...")
             d_branch = ts.diversity(mode='branch')
             
+            # ********** TO DO: correct neutral mutation rates need to be used for each chromosome,
+            # including the elevated mutation rate for the MT chromosome!
             print(f"   overlaying mutations...")
-            ts = msprime.sim_mutations(ts, rate=1e-7, random_seed=1, keep=True)
+            next_id = pyslim.next_slim_mutation_id(ts)
+            ts = msprime.sim_mutations(ts, rate=1e-7, random_seed=1,
+                model=msprime.SLiMMutationModel(type=0, next_id=next_id), keep=True)
             
             print(f"   computing diversity(mode='site')...")
             d_site = ts.diversity(mode='site')
@@ -36,3 +48,6 @@ except FileNotFoundError:
     print(f"Error: Directory '{directory_path}' not found.")
 except Exception as e:
     print(f"An error occurred: {e}")
+
+end = timer()
+print("Elapsed time: ", end - start)
