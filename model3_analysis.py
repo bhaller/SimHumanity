@@ -26,6 +26,9 @@ try:
             print(f"   loading...")
             ts = tskit.load(file_path)
             
+            # remove vacant nodes from the sample, to avoid issues with "missing data" in stats computations
+            ts = pyslim.remove_vacant(ts)
+            
             # ********** TO DO: need to use the correct recombination rate map, as in the SLiM model!
             print(f"   recapitating...")
             ts = pyslim.recapitate(ts, ancestral_Ne=7310, recombination_rate=1e-8, random_seed=1)
