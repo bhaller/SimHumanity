@@ -47,6 +47,9 @@ try:
             print(f"   computing diversity(mode='site')...")
             d_site = ts.diversity(mode='site')
             
+            # with correct mutation rates for the neutral mutation overlay we should see
+            # that d_site = d_branch * mutation rate, roughly, although that is only the
+            # exact expectation if all mutations are neutral
             print(f"       ", d_site, " ", d_branch)
 except FileNotFoundError:
     print(f"Error: Directory '{directory_path}' not found.")
