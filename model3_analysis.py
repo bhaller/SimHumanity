@@ -3,7 +3,7 @@
 # By Ben Haller, 22 June 2025
 # Messer Lab, Cornell University
 
-# note that this requires pyslim 1.2 to run!
+# note that this requires pyslim 1.1.0 or later to run!
 
 from pathlib import Path
 import tskit, msprime, pyslim, warnings
@@ -14,6 +14,7 @@ from timeit import default_timer as timer
 directory_path = Path('/Users/bhaller/Documents/Research/MesserLab/SLiM_project/Publication 2025 HumanPopGen/SimHumanity/simhumanity_trees')
 
 # suppress time unit warnings from msprime; one generation equals one tick in this model, so it is fine
+# ********** TO DO: instead of this, do timeUnits='generations' in the SLiM script so the tree sequence is marked as being in generations
 warnings.simplefilter('ignore', msprime.TimeUnitsMismatchWarning)
 
 start = timer()
