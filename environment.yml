@@ -1,0 +1,12 @@
+name: simhumanity
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - slim==5.0
+  - r-viridis
+  - pip:
+    - tskit
+    - msprime
+    - pyslim>=1.1.0
+    - polars

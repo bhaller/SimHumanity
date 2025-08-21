@@ -55,7 +55,7 @@ initialize() {
 	// Turn on tree-sequence recording and simplify every 500 ticks
 	// Note that 500 is chosen somewhat arbitrarily; one could experiment
 	// with different values to find an optimal balance for one's purposes
-	initializeTreeSeq(simplificationInterval=500);
+	initializeTreeSeq(simplificationInterval=500, timeUnit="generations");
 	
 	// Enable separate sexes; we want to simulate sex chromosomes
 	initializeSex();
