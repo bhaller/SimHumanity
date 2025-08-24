@@ -1,6 +1,8 @@
-# exclude this folder, which is output from model 3
+# exclude trees archives that are produced by model 3; too big for GitHub
 simhumanity_trees
 simhumanity_trees.zip
+simhumanity_trees_RO
+simhumanity_trees_RO.zip
 
 # exclude trees files and the macOS Finder cruft .DS_Store
 *.trees
