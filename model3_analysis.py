@@ -17,6 +17,7 @@ repository_path = Path('/Users/bhaller/Documents/Research/MesserLab/SLiM_project
 # set the current working directory to the SimHumanity repository
 os.chdir(repository_path)
 
+in_path = repository_path / "simhumanity_trees"
 out_path = repository_path / "simhumanity_trees_RO"
 out_path.mkdir(parents=False, exist_ok=False)
 
@@ -62,7 +63,7 @@ start = timer()
 
 try:
     # iterate over the .trees files in the trees archive, in alphabetical order
-    for file_path in sorted((repository_path / "simhumanity_trees").iterdir(), key=lambda x:x.name):
+    for file_path in sorted(in_path.iterdir(), key=lambda x:x.name):
         if file_path.is_file() and file_path.suffix == '.trees':
             print(f"Processing {file_path.name}...")
             print(f"   loading...")
