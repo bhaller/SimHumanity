@@ -13,7 +13,9 @@ import numpy as np
 
 # NOTE: the base repository path needs to be configured for your setup here!
 repository_path = Path('/Users/bhaller/Documents/Research/MesserLab/SLiM_project/Publication 2025 HumanPopGen/SimHumanity')
-os.chdir(repository_path)    # set the current working directory to the SimHumanity repository
+
+# set the current working directory to the SimHumanity repository
+os.chdir(repository_path)
 
 out_path = repository_path / "simhumanity_trees_RO"
 out_path.mkdir(parents=False, exist_ok=False)
@@ -64,7 +66,8 @@ try:
         if file_path.is_file() and file_path.suffix == '.trees':
             print(f"Processing {file_path.name}...")
             print(f"   loading...")
-            # Extracting the chromosome number from the file path
+
+            # extract the chromosome number from the file path
             chrom = str(file_path).split('.')[0].split('_')[-1]
             ts = tskit.load(file_path)
 
@@ -75,6 +78,7 @@ try:
             print(ts)
 
 
+            # recapitate; note this issues a warning about large provenance, because it includes the rate map in the provenance
             print(f"   fetching the recombination rate map...")
             rec_map = get_recomb_map(chrom, ts.sequence_length)
 
@@ -82,30 +86,36 @@ try:
             ts = pyslim.recapitate(ts, ancestral_Ne=7310, recombination_rate=rec_map, random_seed=1)
 
 
-            # computes where the recapitation period starts (in time ago)
+            # compute where the recapitation period starts (in time ago)
             recap_start_time = ts.metadata["SLiM"]["tick"]-ts.metadata["SLiM"]["cycle"]
             print(f"   recapitation period starts at {recap_start_time} time ago")
+
             num_slim_muts = ts.num_mutations
             print(f"   {num_slim_muts} SLiM mutations")
+
+
+            # overlay neutral mutations during the recapitation period
             print(f"   overlaying mutations over the recapitated portion...")
             next_id = pyslim.next_slim_mutation_id(ts)
 
-            # Recapitation period
             ts = msprime.sim_mutations(ts, rate=MU_TOTAL, random_seed=1, model=msprime.SLiMMutationModel(type=0, next_id=next_id), keep=True, start_time=recap_start_time) # start_time is in time ago, so we need to add mutations with a constant rate across the chromosome starting at the time the recapitated period starts (and older)
 
             num_postrecap_muts = ts.num_mutations
-            print(f"   {num_postrecap_muts-num_slim_muts} mutations overlayed over the recapitated portion")
+            print(f"   {num_postrecap_muts-num_slim_muts} mutations overlaid over the recapitated portion")
 
-            # SLiM period
+
+            # overlay neutral mutations during the SLiM period
             print(f"   fetching the mutation rate map for the SLiM period...")
             mut_map = get_mut_map(chrom, ts.sequence_length)
 
             print(f"   overlaying mutations over the SLiM period...")
             next_id = pyslim.next_slim_mutation_id(ts)
+
             ts = msprime.sim_mutations(ts, rate=mut_map, random_seed=1, model=msprime.SLiMMutationModel(type=0, next_id=next_id), keep=True, end_time=recap_start_time)
 
+
             num_total_muts = ts.num_mutations
-            print(f"   {num_total_muts-num_slim_muts} mutations overlayed over the SLiM portion for a total of {num_total_muts} mutations")
+            print(f"   {num_total_muts-num_slim_muts} mutations overlaid over the SLiM portion for a total of {num_total_muts} mutations")
 
 
             # write out the modified tree sequence to simhumanity_trees_RO
