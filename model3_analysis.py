@@ -1,18 +1,22 @@
 # model3_analysis.py
 #
-# By Ben Haller and Murillo F. Rodrigues, 21 August 2025
+# By Ben Haller and Murillo F. Rodrigues, 24 August 2025
 # Messer Lab, Cornell University
 
 # note that this requires pyslim 1.1.0 or later to run!
 
 from pathlib import Path
-import tskit, msprime, pyslim, warnings
+import tskit, msprime, pyslim, warnings, os
 from timeit import default_timer as timer
 import polars as pl
 import numpy as np
 
 # NOTE: the base repository path needs to be configured for your setup here!
-directory_path = Path('/Users/bhaller/Documents/Research/MesserLab/SLiM_project/Publication 2025 HumanPopGen/SimHumanity/simhumanity_trees')
+repository_path = Path('/Users/bhaller/Documents/Research/MesserLab/SLiM_project/Publication 2025 HumanPopGen/SimHumanity')
+os.chdir(repository_path)    # set the current working directory to the SimHumanity repository
+
+out_path = repository_path / "simhumanity_trees_RO"
+out_path.mkdir(parents=False, exist_ok=False)
 
 MU_TOTAL = 2.0e-8
 MU_BENEF = 1e-12
@@ -21,7 +25,7 @@ MU_DELET = 1.2e-8
 def get_recomb_map(chrom, seq_len):
     """
     Returns a recombination rate map (msprime.RateMap) for a given chromosome.
-    Note the path to stdpopsim extraction is hardcoded in the function.
+    Note the relative path to stdpopsim extraction is hardcoded in the function.
     """
     if chrom == 'MT':
         positions = np.array([0, seq_len])
@@ -38,7 +42,7 @@ def get_mut_map(chrom, seq_len, mt_multiplier = 20):
     """
     Returns a mutation rate map (msprime.RateMap) for a given chromosome.
     For the MT chromosome, the mutation rate is constant and equal to MU_TOTAL multiplied by mt_multiplier.
-    Note the path to stdpopsim extraction and the mutation rates are hardcoded in the function.
+    Note the relative paths to stdpopsim extraction and the mutation rates are hardcoded in the function.
     """
     if chrom == 'MT':
         breakpoints = np.array([0, seq_len])
@@ -56,7 +60,7 @@ start = timer()
 
 try:
     # iterate over the .trees files in the trees archive, in alphabetical order
-    for file_path in sorted(directory_path.iterdir(), key=lambda x:x.name):
+    for file_path in sorted((repository_path / "simhumanity_trees").iterdir(), key=lambda x:x.name):
         if file_path.is_file() and file_path.suffix == '.trees':
             print(f"Processing {file_path.name}...")
             print(f"   loading...")
@@ -77,9 +81,6 @@ try:
             print(f"   recapitating...")
             ts = pyslim.recapitate(ts, ancestral_Ne=7310, recombination_rate=rec_map, random_seed=1)
 
-            print(f"   computing diversity(mode='branch')...")
-            d_branch = ts.diversity(mode='branch')
-
 
             # computes where the recapitation period starts (in time ago)
             recap_start_time = ts.metadata["SLiM"]["tick"]-ts.metadata["SLiM"]["cycle"]
@@ -90,8 +91,7 @@ try:
             next_id = pyslim.next_slim_mutation_id(ts)
 
             # Recapitation period
-            ts = msprime.sim_mutations(ts, rate=MU_TOTAL, random_seed=1,
-            model=msprime.SLiMMutationModel(type=0, next_id=next_id), keep=True, start_time=recap_start_time) # start_time is in time ago, so we need to add mutations with a constant rate across the chromosome starting at the time the recapitated period starts (and older)
+            ts = msprime.sim_mutations(ts, rate=MU_TOTAL, random_seed=1, model=msprime.SLiMMutationModel(type=0, next_id=next_id), keep=True, start_time=recap_start_time) # start_time is in time ago, so we need to add mutations with a constant rate across the chromosome starting at the time the recapitated period starts (and older)
 
             num_postrecap_muts = ts.num_mutations
             print(f"   {num_postrecap_muts-num_slim_muts} mutations overlayed over the recapitated portion")
@@ -102,14 +102,15 @@ try:
 
             print(f"   overlaying mutations over the SLiM period...")
             next_id = pyslim.next_slim_mutation_id(ts)
-            ts = msprime.sim_mutations(ts, rate=mut_map, random_seed=1,
-            model=msprime.SLiMMutationModel(type=0, next_id=next_id), keep=True, end_time=recap_start_time)
+            ts = msprime.sim_mutations(ts, rate=mut_map, random_seed=1, model=msprime.SLiMMutationModel(type=0, next_id=next_id), keep=True, end_time=recap_start_time)
 
             num_total_muts = ts.num_mutations
             print(f"   {num_total_muts-num_slim_muts} mutations overlayed over the SLiM portion for a total of {num_total_muts} mutations")
-            print(f"   computing diversity(mode='site')...")
-            d_site = ts.diversity(mode='site')
-            print(f"       ", d_site, " ", d_branch*MU_TOTAL)
+
+
+            # write out the modified tree sequence to simhumanity_trees_RO
+            print(f"   writing modified tree sequence...")
+            ts.dump(str(out_path / file_path.name))
 except FileNotFoundError:
     print(f"Error: Directory '{directory_path}' not found.")
 except Exception as e:
