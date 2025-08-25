@@ -73,7 +73,11 @@ try:
             ts = tskit.load(file_path)
 
             # remove vacant nodes from the sample, to avoid issues with "missing data" in stats computations
-            ts = pyslim.remove_vacant(ts)
+            # this is only needed for the X/Y/MT chromosomes, where vacant nodes could exist; skip it otherwise
+            if ((chrom == 'X') or (chrom == 'Y') or (chrom == 'MT')):
+                ts = pyslim.remove_vacant(ts)
+            else:
+                print(f"   skipping remove_vacant() for chromosome {chrom}")
 
             print(f"Basic tree sequence information:")
             print(ts)
