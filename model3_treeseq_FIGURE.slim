@@ -166,4 +166,17 @@ initialize() {
 79024 late() {
 	// Write out the final trees archive, overwriting an existing archive
 	sim.treeSeqOutput("simhumanity_trees", overwriteDirectory=T);
+	
+	// This version also writes out information about all fixed mutations, for the analysis
+	fixed_del = sim.substitutionsOfType(m1);
+	fixed_ben = sim.substitutionsOfType(m2);
+	
+	catn();
+	catn("Fixed deleterious positions: " + paste(fixed_del.position, sep=", "));
+	catn("Fixed deleterious chromosomes: " + paste(fixed_del.chromosome.symbol, sep=", "));
+	catn("Fixed deleterious selcoeffs: " + paste(fixed_del.selectionCoeff, sep=", "));
+	catn();
+	catn("Fixed beneficial positions: " + paste(fixed_ben.position, sep=", "));
+	catn("Fixed beneficial chromosomes: " + paste(fixed_ben.chromosome.symbol, sep=", "));
+	catn("Fixed beneficial selcoeffs: " + paste(fixed_ben.selectionCoeff, sep=", "));
 }
