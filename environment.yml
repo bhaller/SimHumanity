@@ -5,6 +5,9 @@ channels:
 dependencies:
   - slim==5.0
   - r-viridis
+  - altair
+  - vegafusion-python-embed
+  - vegafusion
   - pip:
     - tskit
     - msprime
