@@ -2,12 +2,15 @@ name: simhumanity
 channels:
   - conda-forge
   - bioconda
+  - anaconda
 dependencies:
   - slim==5.0
   - r-viridis
   - altair
   - vegafusion-python-embed
   - vegafusion
+  - pyranges
+  - vl-convert-python
   - pip:
     - tskit
     - msprime
