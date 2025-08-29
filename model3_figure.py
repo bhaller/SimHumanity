@@ -11,6 +11,50 @@ import altair as alt
 
 alt.data_transformers.enable("vegafusion")
 
+def violin_and_boxplot(data, y_col, x_col, title, IN_TO_PX=72):
+    violins = alt.Chart().transform_density(
+        y_col,
+        as_=[y_col, 'density'],
+        groupby=['type']
+    ).mark_area(orient='horizontal').encode(
+        y=alt.Y(y_col, title=title),
+        color=alt.Color(x_col, legend=None),
+        x=alt.X(
+            'density:Q',
+            stack='center',
+            impute=None,
+            title=None,
+            axis=alt.Axis(labels=False, values=[0],grid=False, ticks=True),
+            scale=alt.Scale(nice=False,zero=False),
+        ),
+    )
+
+    boxplot = alt.Chart().mark_boxplot(size=5, extent=0, outliers=False).encode(
+            y=alt.Y(y_col, title=title),
+            color=alt.value('black')
+        )
+
+    violin_boxplot = alt.layer(
+        violins,
+        boxplot
+    ).properties(
+        width=11*IN_TO_PX*0.2,
+        height=8.5*IN_TO_PX*0.4,
+
+    ).facet(
+        data=data,
+        column=alt.Column(
+            x_col,
+            header=alt.Header(
+                titleOrient='bottom',
+                labelOrient='bottom',
+                labelPadding=0,
+            ),
+            title=None
+        )
+    ).resolve_scale(x=alt.ResolveMode("independent"))
+    return violin_boxplot
+
 # NOTE: the base repository path needs to be configured for your setup here!
 repository_path = Path('/Users/rodrigmu/Documents/SimHumanity')
 
@@ -73,25 +117,18 @@ ge_df = ge_df.filter(pl.col("branch_div") > 0.01) # 0 branch diversity means low
 ge_df = ge_df.with_columns(log_ratio = (pl.col("ratio").log10()))
 
 IN_TO_PX = 72
-site_boxplot = alt.Chart(ge_df.with_columns(log_site_div = (pl.col("site_div")).log10())).mark_boxplot().encode(
-    x = alt.X("type", title="", sort='descending'),
-    y = alt.Y("log_site_div", title="Site diversity (log10-scaled)"),
-    color = alt.Color("type", title="Genomic element type", sort="descending", legend=None),
-).properties(
-    width=11*IN_TO_PX*0.4,
-    height=8.5*IN_TO_PX*0.4,
-)
-site_boxplot.save("site_boxplot.pdf")
 
-branch_boxplot = alt.Chart(ge_df.filter(pl.col("branch_div") > 0.01).with_columns(log_branch_div = (pl.col("branch_div")).log10())).mark_boxplot().encode(
-    x = alt.X("type", title="", sort='descending'),
-    y = alt.Y("log_branch_div", title="Branch diversity (log10-scaled)", scale=alt.Scale(domain=[2, 6])),
-    color = alt.Color("type", title="Genomic element type", sort="descending", legend=None),
-).properties(
-    width=11*IN_TO_PX*0.4,
-    height=8.5*IN_TO_PX*0.4,
+# Plot violins for site and branch diversity
+data = ge_df.with_columns(
+    log_site_div = pl.max_horizontal(pl.lit(1e-8), pl.col("site_div")).log10()
 )
-branch_boxplot.save("branch_boxplot.pdf")
+site_violin = violin_and_boxplot(data, "log_site_div", "type", "Site diversity (log10-scaled)")
+site_violin.save("site_plot.pdf")
+
+data=ge_df.with_columns(log_branch_div = (pl.col("branch_div")).log10())
+branch_violin = violin_and_boxplot(data, "log_branch_div", "type", "Branch diversity (log10-scaled)")
+branch_violin.save("branch_plot.pdf")
+branch_violin
 
 # Plot of ratio site/branch div along chromosome 1
 seq_len = ts1.sequence_length
@@ -104,7 +141,7 @@ branch_div = ts1.diversity(windows=breakpoints, mode="branch")
 df = pl.DataFrame({"start":breakpoints[:-1], "end":breakpoints[1:], "site_div":site_div, "branch_div":branch_div})
 df = df.with_columns(ratio = pl.col("site_div")/pl.col("branch_div"))
 
-ratio_plot = alt.Chart(df.filter(pl.col("branch_div") > 0.01)).mark_line().encode(
+ratio_plot = alt.Chart(df.filter(pl.col("branch_div") > 0.01)).mark_line(color="black").encode(
     x = alt.X("start", title="Position"),
     y = alt.Y("ratio", title="Site/Branch Diversity Ratio", axis=alt.Axis(format=".1e"), scale=alt.Scale(domain=[1.8e-8, 2.2e-8])),
 ).properties(
@@ -114,7 +151,10 @@ ratio_plot = alt.Chart(df.filter(pl.col("branch_div") > 0.01)).mark_line().encod
 ratio_plot.save("ratio_plot.pdf")
 
 # Combined panel with site, branch and along chr1 plots
-combined = alt.vconcat(site_boxplot.properties(title='A') | branch_boxplot.properties(title='B') , ratio_plot.properties(title='C') , center=True).configure_title(anchor='start')
-combined.save("combined.png", ppi=400)
-combined
-
+combined = alt.vconcat(site_violin.properties(title='A') | branch_violin.properties(title='B') , ratio_plot.properties(title='C') , center=True).configure_title(anchor='start').configure_facet(
+    spacing=0
+).configure_view(
+    stroke=None
+)
+combined.save("figure3.png", ppi=400)
+combined.save("figure3.pdf")
