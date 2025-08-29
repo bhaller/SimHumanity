@@ -15,7 +15,7 @@
 function (void)defineRepositoryPaths(void)
 {
 	// Set the working directory to our data repository
-	defineConstant("REPO_PATH", "/Users/bhaller/Desktop/SimHumanity/");
+	defineConstant("REPO_PATH", "/path/to/SimHumanity/");
 	if (!fileExists(REPO_PATH))
 		stop("incorrect repository path");
 	setwd(REPO_PATH);

@@ -12,7 +12,7 @@ import polars as pl
 import numpy as np
 
 # NOTE: the base repository path needs to be configured for your setup here!
-repository_path = Path('/Users/bhaller/Documents/Research/MesserLab/SLiM_project/Publication 2025 HumanPopGen/SimHumanity')
+repository_path = Path('/path/to/SimHumanity')
 
 # set the current working directory to the SimHumanity repository
 os.chdir(repository_path)

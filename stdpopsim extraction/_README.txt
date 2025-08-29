@@ -15,9 +15,9 @@ The data generation provided here was done with stdpopsim version 0.3.0.  NOTE t
 
 Choices made:
 
-- For the recombination map I chose HapMapII_GRCh38 somewhat arbitrarily.  Maybe DeCodeSexAveraged_GRCh38 would be a better choice?
+- For the recombination map I chose HapMapII_GRCh38 somewhat arbitrarily.  Maybe DeCodeSexAveraged_GRCh38 would be a good choice too?
 
-- For the DFE I've chosen PosNeg_R24 as one that sounds quite up to date, without getting into the complexity of different dominance coefficients for different selection coefficient categories.  It also includes beneficials, which is nice for demo purposes.  I use the overall mutation rate of 2.0e-8 from this DFE as well, NOT the rate from the demographic model, since the DFE was fitted with 2.0e-8.  Note that Murillo says that mutation rate maps do not exist yet for humans; the data is just not there yet.
+- For the DFE I've chosen PosNeg_R24 as one that sounds quite up to date, without getting into the complexity of different dominance coefficients for different selection coefficient categories.  It also includes beneficials, which is nice for demo purposes.  I use the overall mutation rate of 2.0e-8 from this DFE as well, NOT the rate from the demographic model, since the DFE was fitted with 2.0e-8.
 
 - For the coding vs. non-coding regions I've used ensembl_havana_104_CDS; could use ensembl_havana_104_exons instead, but showing coding vs. non-coding seems natural.  Anyhow, this is a somewhat arbitrary choice.
 
