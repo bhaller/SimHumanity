@@ -24,6 +24,7 @@ out_path.mkdir(parents=False, exist_ok=False)
 MU_TOTAL = 2.0e-8
 MU_BENEF = 1e-12
 MU_DELET = 1.2e-8
+RECAP_START_TIME = 65795-1 # the start time is inclusive
 
 def get_recomb_map(chrom, seq_len):
     """
@@ -91,10 +92,6 @@ try:
             ts = pyslim.recapitate(ts, ancestral_Ne=7310, recombination_rate=rec_map, random_seed=1)
 
 
-            # compute where the recapitation period starts (in time ago)
-            recap_start_time = ts.metadata["SLiM"]["tick"]-ts.metadata["SLiM"]["cycle"]
-            print(f"   recapitation period starts at {recap_start_time} time ago")
-
             num_slim_muts = ts.num_mutations
             print(f"   {num_slim_muts} SLiM mutations")
 
@@ -103,7 +100,7 @@ try:
             print(f"   overlaying mutations over the recapitated portion...")
             next_id = pyslim.next_slim_mutation_id(ts)
 
-            ts = msprime.sim_mutations(ts, rate=MU_TOTAL, random_seed=1, model=msprime.SLiMMutationModel(type=0, next_id=next_id), keep=True, start_time=recap_start_time) # start_time is in time ago, so we need to add mutations with a constant rate across the chromosome starting at the time the recapitated period starts (and older)
+            ts = msprime.sim_mutations(ts, rate=MU_TOTAL, random_seed=1, model=msprime.SLiMMutationModel(type=0, next_id=next_id), keep=True, start_time=RECAP_START_TIME) # start_time is in time ago, so we need to add mutations with a constant rate across the chromosome starting at the time the recapitated period starts (and older)
 
             num_postrecap_muts = ts.num_mutations
             print(f"   {num_postrecap_muts-num_slim_muts} mutations overlaid over the recapitated portion")
@@ -116,7 +113,7 @@ try:
             print(f"   overlaying mutations over the SLiM period...")
             next_id = pyslim.next_slim_mutation_id(ts)
 
-            ts = msprime.sim_mutations(ts, rate=mut_map, random_seed=1, model=msprime.SLiMMutationModel(type=0, next_id=next_id), keep=True, end_time=recap_start_time)
+            ts = msprime.sim_mutations(ts, rate=mut_map, random_seed=1, model=msprime.SLiMMutationModel(type=0, next_id=next_id), keep=True, end_time=RECAP_START_TIME)
 
 
             num_total_muts = ts.num_mutations
@@ -127,7 +124,7 @@ try:
             print(f"   writing modified tree sequence...")
             ts.dump(str(out_path / file_path.name))
 except FileNotFoundError:
-    print(f"Error: Directory '{directory_path}' not found.")
+    print(f"Error: Directory '{repository_path}' not found.")
 except Exception as e:
     print(f"An error occurred: {e}")
 
