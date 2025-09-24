@@ -24,6 +24,7 @@ out_path.mkdir(parents=False, exist_ok=False)
 MU_TOTAL = 2.0e-8
 MU_BENEF = 1e-12
 MU_DELET = 1.2e-8
+MT_MULTIPLIER = 20
 RECAP_START_TIME = 65795-1 # the start time is inclusive
 
 def get_recomb_map(chrom, seq_len):
@@ -42,21 +43,24 @@ def get_recomb_map(chrom, seq_len):
         rates = rec_df['rate'].to_numpy()
     return msprime.RateMap(position=positions, rate=rates)
 
-def get_mut_map(chrom, seq_len, mt_multiplier = 20):
+def get_mut_map(chrom, seq_len):
     """
     Returns a mutation rate map (msprime.RateMap) for a given chromosome.
     For the MT chromosome, the mutation rate is constant and equal to MU_TOTAL multiplied by mt_multiplier.
     Note the relative paths to stdpopsim extraction and the mutation rates are hardcoded in the function.
     """
+    neutral_region_mrate = MU_TOTAL
+    selected_region_mrate = MU_TOTAL - MU_BENEF - MU_DELET
     if chrom == 'MT':
-        breakpoints = np.array([0, seq_len])
-        rates = np.array([MU_TOTAL*mt_multiplier])
+        ge_path = Path(f'mtDNA info/chrMT_genomic_elements.txt')
+        neutral_region_mrate = neutral_region_mrate * MT_MULTIPLIER
+        selected_region_mrate = selected_region_mrate * MT_MULTIPLIER
     else:
         ge_path = Path(f'stdpopsim extraction/extracted/chr{chrom}_genomic_elements.txt')
-        ge_df = pl.read_csv(ge_path, has_header=False, new_columns=["type", "start", "end"])
-        ge_df = ge_df.with_columns(pl.when(pl.col("type") == 0).then(pl.lit(MU_TOTAL)).otherwise(pl.lit(MU_TOTAL-MU_BENEF-MU_DELET)).alias("neutral_rate")) # computing the neutral rate for each genomic element
-        breakpoints = np.append(ge_df["start"].to_numpy(), seq_len)
-        rates = ge_df["neutral_rate"].to_numpy()
+    ge_df = pl.read_csv(ge_path, has_header=False, new_columns=["type", "start", "end"])
+    ge_df = ge_df.with_columns(pl.when(pl.col("type") == 0).then(pl.lit(neutral_region_mrate)).otherwise(pl.lit(selected_region_mrate)).alias("neutral_rate")) # computing the neutral rate for each genomic element
+    breakpoints = np.append(ge_df["start"].to_numpy(), seq_len)
+    rates = ge_df["neutral_rate"].to_numpy()
     return msprime.RateMap(position=breakpoints, rate=rates)
 
 
@@ -100,7 +104,8 @@ try:
             print(f"   overlaying mutations over the recapitated portion...")
             next_id = pyslim.next_slim_mutation_id(ts)
 
-            ts = msprime.sim_mutations(ts, rate=MU_TOTAL, random_seed=1, model=msprime.SLiMMutationModel(type=0, next_id=next_id), keep=True, start_time=RECAP_START_TIME) # start_time is in time ago, so we need to add mutations with a constant rate across the chromosome starting at the time the recapitated period starts (and older)
+            recap_mrate = MU_TOTAL*MT_MULTIPLIER if chrom == "MT" else MU_TOTAL
+            ts = msprime.sim_mutations(ts, rate=recap_mrate, random_seed=1, model=msprime.SLiMMutationModel(type=0, next_id=next_id), keep=True, start_time=RECAP_START_TIME) # start_time is in time ago, so we need to add mutations with a constant rate across the chromosome starting at the time the recapitated period starts (and older)
 
             num_postrecap_muts = ts.num_mutations
             print(f"   {num_postrecap_muts-num_slim_muts} mutations overlaid over the recapitated portion")
