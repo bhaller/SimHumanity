@@ -1,6 +1,6 @@
 # model3_analysis.py
 #
-# By Ben Haller and Murillo F. Rodrigues, 24 August 2025
+# By Murillo F. Rodrigues and Benjamin C. Haller, 24 August 2025
 # Messer Lab, Cornell University
 
 # note that this requires pyslim 1.1.0 or later to run!
@@ -79,6 +79,8 @@ try:
 
             # remove vacant nodes from the sample, to avoid issues with "missing data" in stats computations
             # this is only needed for the X/Y/MT chromosomes, where vacant nodes could exist; skip it otherwise
+            # note that we do not call restore_vacant() at the end; it takes significant time in pyslim 1.1.0,
+            # and we don't need the vacant nodes for any of our downstream analysis
             if ((chrom == 'X') or (chrom == 'Y') or (chrom == 'MT')):
                 ts = pyslim.remove_vacant(ts)
             else:
